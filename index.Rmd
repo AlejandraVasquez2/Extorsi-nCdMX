@@ -1,0 +1,302 @@
+---
+title: 'Carpetas de investigación: Extorsión en CDMX'
+author: "Alejandra Arias Vásquez"
+date: " "
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+    collapsed: TRUE
+    smooth_scroll: TRUE
+    theme: journal
+
+    
+
+
+---
+```{r setup, include=FALSE, cache=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, error = FALSE, comment = NA)
+```
+
+
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE, error=FALSE, comment=NA,include=FALSE}
+options(scipen = 999)
+library("pacman")
+p_load(tidyverse,readxl, readr, dplyr,tidyr,writexl,foreign,naniar,plyr, scales,lubridate)
+library(ggplot2)
+install.packages("leaflet", repos = "http://cran.us.r-project.org")
+library(leaflet)
+install.packages("remotes", repos = "http://cran.us.r-project.org")
+library(remotes)
+install_github("r-spatial/sf", force = TRUE)
+library(sf)
+```
+
+```{r, warning=FALSE, echo=FALSE, message=FALSE, error=FALSE, comment=NA, include=FALSE}
+carpetas2016 <- read_csv("C:/Users/vasq_/OneDrive/EjerciciosR/Mapas/carpetasFGJ_2016.csv")
+carpetas2016 <- carpetas2016 %>% select(-c(anio_inicio, fecha_inicio, fecha_hecho, hora_inicio, hora_hecho, mes_inicio, competencia))
+carpetas2016 <- carpetas2016 %>% filter(delito=="EXTORSION")
+carpetas2016$Total <- ifelse(carpetas2016$delito=="EXTORSION", 1,0)
+alcaldia2016 <- carpetas2016 %>% group_by(alcaldia_hecho, longitud, latitud) %>% tally(Total)
+alcaldia2016 = alcaldia2016[-c(7,18,230), ]
+```
+
+
+```{r, warning=FALSE, echo=FALSE, message=FALSE, error=FALSE, comment=NA, include=FALSE}
+poli <- st_read("C:/Users/vasq_/OneDrive/EjerciciosR/Mapas/poligonos_alcaldias_cdmx.shp")
+```
+
+
+# Extorsión en CDMX (2016)
+
+```{r warning=FALSE}
+
+mapabase_16 <- leaflet(alcaldia2016) %>%
+    addProviderTiles(providers$CartoDB.Positron) %>% 
+    addCircles(~longitud, ~latitud, weight = 3, radius = 40,stroke = TRUE,
+               fillOpacity = 0.8,color = "purple") %>% 
+    setView(lng = -99.12766, lat = 19.42847, zoom = 10) %>% 
+    addPolygons(data = poli, weight = 2,  color = "grey", stroke = 1, 
+                opacity = 0.6, highlightOptions = highlightOptions(weight = 5,
+                color = "white", fillOpacity = 0.7, bringToFront = TRUE),
+                label = ~poli$NOMGEO,labelOptions = labelOptions(direction = "auto")) 
+mapabase_16
+```
+
+# Cluster de incidencia de extorsión
+
+```{r warning=FALSE}
+cluster16 <- leaflet(alcaldia2016) %>%
+  addTiles() %>%
+  addProviderTiles(providers$CartoDB.Positron) %>% 
+  setView(lng = -99.12766, lat = 19.42847, zoom = 10) %>%
+  addCircleMarkers(lng = ~longitud, lat = ~latitud,clusterOptions = markerClusterOptions())%>%
+  addPolygons(data = poli, color = "grey", stroke = 1, weight = 1, opacity = 0.6,
+              highlightOptions = highlightOptions(weight = 5, color = "white",
+                                                  fillOpacity = 0.7, bringToFront = TRUE))
+cluster16
+```
+
+
+```{r, warning=FALSE, echo=FALSE, message=FALSE, error=FALSE, comment=NA, include=FALSE}
+carpetas2017 <- read.csv("C:/Users/vasq_/OneDrive/EjerciciosR/Mapas/carpetasFGJ_2017.csv")
+carpetas2017 <- carpetas2017 %>% select(-c(anio_inicio, fecha_inicio, fecha_hecho, hora_inicio, hora_hecho, mes_inicio, competencia))
+carpetas2017 <- carpetas2017 %>% filter(delito=="EXTORSION")
+carpetas2017$Total <- ifelse(carpetas2017$delito=="EXTORSION", 1,0)
+alcaldia17 <- carpetas2017 %>% group_by(alcaldia_hecho, longitud,latitud) %>% tally(Total)
+```
+
+```{r, warning=FALSE, echo=FALSE, message=FALSE, error=FALSE, comment=NA, include=FALSE}
+poli <- st_read("C:/Users/vasq_/OneDrive/EjerciciosR/Mapas/poligonos_alcaldias_cdmx.shp")
+```
+
+
+# Extorsión en CDMX (2017)
+
+```{r warning=FALSE}
+map17 <- leaflet(alcaldia17) %>%
+  addProviderTiles(providers$CartoDB.Positron) %>% 
+  addCircles(~longitud, ~latitud, weight = 3, radius = 40,stroke = TRUE,
+             fillOpacity = 0.8,color = "purple") %>% 
+  setView(lng = -99.12766, lat = 19.42847, zoom = 10) %>% 
+  addPolygons(data = poli, weight = 2,  color = "grey", stroke = 1, 
+              opacity = 0.6,
+              highlightOptions = highlightOptions(weight = 5,                                                                 color = "white", fillOpacity = 0.7, bringToFront = TRUE),
+              label = ~poli$NOMGEO,labelOptions = labelOptions(direction = "auto")) 
+map17
+```
+
+
+
+```{r, warning=FALSE, echo=FALSE, message=FALSE, error=FALSE, comment=NA, include=FALSE}
+carpetas2018 <- read.csv("C:/Users/vasq_/OneDrive/EjerciciosR/Mapas/carpetasFGJ_2018.csv")
+carpetas2018 <- carpetas2018 %>% select(-c(anio_inicio, fecha_inicio, fecha_hecho, hora_inicio, hora_hecho, mes_inicio, competencia))
+carpetas2018 <- carpetas2018 %>% filter(delito=="EXTORSION")
+carpetas2018$Total <- ifelse(carpetas2018$delito=="EXTORSION", 1,0)
+alcaldia18 <- carpetas2018 %>% group_by(alcaldia_hecho, longitud,latitud) %>% tally(Total)
+```
+
+```{r, warning=FALSE, echo=FALSE, message=FALSE, error=FALSE, comment=NA, include=FALSE}
+poli <- st_read("C:/Users/vasq_/OneDrive/EjerciciosR/Mapas/poligonos_alcaldias_cdmx.shp")
+```
+
+
+# Extorsión en CDMX (2018)
+
+```{r warning=FALSE}
+map18 <- leaflet(alcaldia18) %>%
+  addProviderTiles(providers$CartoDB.Positron) %>% 
+  addCircles(~longitud, ~latitud, weight = 3, radius = 40,stroke = TRUE,
+             fillOpacity = 0.8,color = "purple") %>% 
+  setView(lng = -99.12766, lat = 19.42847, zoom = 10) %>% 
+  addPolygons(data = poli, weight = 2,  color = "grey", stroke = 1, 
+              opacity = 0.6,
+              highlightOptions = highlightOptions(weight = 5,                                                                 color = "white", fillOpacity = 0.7, bringToFront = TRUE),
+              label = ~poli$NOMGEO,labelOptions = labelOptions(direction = "auto")) 
+map18
+```
+
+
+```{r, warning=FALSE, echo=FALSE, message=FALSE, error=FALSE, comment=NA, include=FALSE}
+carpetas2019 <- read.csv("C:/Users/vasq_/OneDrive/EjerciciosR/Mapas/carpetasFGJ_2019.csv")
+carpetas2019 <- carpetas2019 %>% select(-c(anio_inicio, fecha_inicio, fecha_hecho, hora_inicio, hora_hecho, mes_inicio, competencia))
+carpetas2019 <- carpetas2019 %>% filter(delito=="EXTORSION")
+carpetas2019$Total <- ifelse(carpetas2019$delito=="EXTORSION", 1,0)
+alcaldia19 <- carpetas2019 %>% group_by(alcaldia_hecho, longitud,latitud) %>% tally(Total)
+```
+
+```{r, warning=FALSE, echo=FALSE, error=FALSE, message=FALSE, comment=NA, include=FALSE}
+poli <- st_read("C:/Users/vasq_/OneDrive/EjerciciosR/Mapas/poligonos_alcaldias_cdmx.shp")
+```
+
+# Extorsión en CDMX (2019)
+
+```{r warning=FALSE}
+map19 <- leaflet(alcaldia19) %>%
+  addProviderTiles(providers$CartoDB.Positron) %>% 
+  addCircles(~longitud, ~latitud, weight = 3, radius = 40,stroke = TRUE,
+             fillOpacity = 0.8,color = "purple") %>% 
+  setView(lng = -99.12766, lat = 19.42847, zoom = 10) %>% 
+  addPolygons(data = poli, weight = 2,  color = "grey", stroke = 1, 
+              opacity = 0.6,
+              highlightOptions = highlightOptions(weight = 5,                                                                 color = "white", fillOpacity = 0.7, bringToFront = TRUE),
+              label = ~poli$NOMGEO,labelOptions = labelOptions(direction = "auto")) 
+map19
+```
+
+
+```{r, warning=FALSE, echo=FALSE, message=FALSE, comment=NA, error=FALSE, include=FALSE}
+carpetas2020 <- read.csv("C:/Users/vasq_/OneDrive/EjerciciosR/Mapas/carpetasFGJ_2020.csv")
+carpetas2020 <- carpetas2020 %>% select(-c(anio_inicio, fecha_inicio, fecha_hecho, hora_inicio, hora_hecho, mes_inicio, competencia))
+carpetas2020 <- carpetas2020 %>% filter(delito=="EXTORSION")
+carpetas2020$Total <- ifelse(carpetas2020$delito=="EXTORSION", 1,0)
+alcaldia2020 <- carpetas2020 %>% group_by(alcaldia_hecho, longitud,latitud) %>% tally(Total)
+```
+
+```{r, warning=FALSE, echo=FALSE, error=FALSE, message=FALSE, comment=NA, include=FALSE}
+poli <- st_read("C:/Users/vasq_/OneDrive/EjerciciosR/Mapas/poligonos_alcaldias_cdmx.shp")
+```
+
+
+# Extorsión en CDMX (2020)
+
+```{r warning=FALSE}
+map20 <- leaflet(alcaldia2020) %>%
+  addProviderTiles(providers$CartoDB.Positron) %>% 
+  addCircles(~longitud, ~latitud, weight = 3, radius = 40,stroke = TRUE,
+             fillOpacity = 0.8,color = "purple") %>% 
+  setView(lng = -99.12766, lat = 19.42847, zoom = 10) %>% 
+  addPolygons(data = poli, weight = 2,  color = "grey", stroke = 1, 
+              opacity = 0.6,
+              highlightOptions = highlightOptions(weight = 5,                                                                 color = "white", fillOpacity = 0.7, bringToFront = TRUE),
+              label = ~poli$NOMGEO,labelOptions = labelOptions(direction = "auto"))
+map20
+```
+
+
+```{r, warning=FALSE, echo=FALSE, message=FALSE, error=FALSE, comment=NA, include=FALSE}
+carpetas2021 <- read.csv("C:/Users/vasq_/OneDrive/EjerciciosR/Mapas/carpetasFGJ_2021.csv")
+carpetas2021 <- carpetas2021 %>% select(-c(anio_inicio, fecha_inicio, fecha_hecho, hora_inicio, hora_hecho, mes_inicio, competencia))
+carpetas2021 <- carpetas2021 %>% filter(delito=="EXTORSION")
+carpetas2021$Total <- ifelse(carpetas2021$delito=="EXTORSION", 1,0)
+alcaldia2021 <- carpetas2021 %>% group_by(alcaldia_hecho, longitud,latitud) %>% tally(Total)
+```
+
+```{r, warning=FALSE, message=FALSE, error=FALSE, echo=FALSE, comment=NA, include=FALSE}
+poli <- st_read("C:/Users/vasq_/OneDrive/EjerciciosR/Mapas/poligonos_alcaldias_cdmx.shp")
+```
+
+
+# Extorsión en CDMX (2021)
+
+```{r warning=FALSE}
+map21 <- leaflet(alcaldia2021) %>%
+  addProviderTiles(providers$CartoDB.Positron) %>% 
+  addCircles(~longitud, ~latitud, weight = 3, radius = 40,stroke = TRUE,
+             fillOpacity = 0.8,color = "purple") %>% 
+  setView(lng = -99.12766, lat = 19.42847, zoom = 10) %>% 
+  addPolygons(data = poli, weight = 2,  color = "grey", stroke = 1, 
+              opacity = 0.6,
+              highlightOptions = highlightOptions(weight = 5,                                                                 color = "white", fillOpacity = 0.7, bringToFront = TRUE),
+              label = ~poli$NOMGEO,labelOptions = labelOptions(direction = "auto")) 
+map21
+```
+
+
+```{r, warning=FALSE, error=FALSE, echo=FALSE, message=FALSE, comment=NA, include=FALSE}
+carpetas2022 <- read.csv("C:/Users/vasq_/OneDrive/EjerciciosR/Mapas/carpetasFGJ_2022.csv")
+carpetas2022 <- carpetas2022 %>% select(-c(anio_inicio, fecha_inicio, fecha_hecho, hora_inicio, hora_hecho, mes_inicio, competencia))
+carpetas2022 <- carpetas2022 %>% filter(delito=="EXTORSION")
+carpetas2022$Total <- ifelse(carpetas2022$delito=="EXTORSION", 1,0)
+alcaldia2022 <- carpetas2022 %>% group_by(alcaldia_hecho, longitud,latitud) %>% tally(Total)
+```
+
+```{r, warning=FALSE, echo=FALSE, error=FALSE, message=FALSE, comment=NA, include=FALSE}
+poli <- st_read("C:/Users/vasq_/OneDrive/EjerciciosR/Mapas/poligonos_alcaldias_cdmx.shp")
+```
+
+
+# Extorsión en CDMX (2022)
+
+```{r warning=FALSE}
+map22 <- leaflet(alcaldia2022) %>%
+  addProviderTiles(providers$CartoDB.Positron) %>% 
+  addCircles(~longitud, ~latitud, weight = 3, radius = 40,stroke = TRUE,
+             fillOpacity = 0.8,color = "purple") %>% 
+  setView(lng = -99.12766, lat = 19.42847, zoom = 10) %>% 
+  addPolygons(data = poli, weight = 2,  color = "grey", stroke = 1, 
+              opacity = 0.6,
+              highlightOptions = highlightOptions(weight = 5,                                                                 color = "white", fillOpacity = 0.7, bringToFront = TRUE),
+              label = ~poli$NOMGEO,labelOptions = labelOptions(direction = "auto")) 
+map22
+```
+
+```{r, warning=FALSE, echo=FALSE, message=FALSE, error=FALSE, comment=NA, include=FALSE}
+carpetas2023 <- read.csv("C:/Users/vasq_/OneDrive/EjerciciosR/Mapas/carpetasFGJ_2023.csv")
+carpetas2023 <- carpetas2023 %>% select(-c(anio_inicio, fecha_inicio, fecha_hecho, hora_inicio, hora_hecho, mes_inicio, competencia))
+carpetas2023 <- carpetas2023 %>% filter(delito=="EXTORSION")
+carpetas2023$Total <- ifelse(carpetas2023$delito=="EXTORSION", 1,0)
+alcaldia2023 <- carpetas2023 %>% group_by(alcaldia_hecho, longitud,latitud) %>% tally(Total)
+```
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE, error=FALSE, comment=NA, include=FALSE}
+poli <- st_read("C:/Users/vasq_/OneDrive/EjerciciosR/Mapas/poligonos_alcaldias_cdmx.shp")
+```
+
+
+# Extorsión en CDMX (2023)
+
+```{r warning=FALSE}
+map23 <- leaflet(alcaldia2023) %>%
+  addProviderTiles(providers$CartoDB.Positron) %>% 
+  addCircles(~longitud, ~latitud, weight = 3, radius = 40,stroke = TRUE,
+             fillOpacity = 0.8,color = "purple") %>% 
+  setView(lng = -99.12766, lat = 19.42847, zoom = 10) %>% 
+  addPolygons(data = poli, weight = 2,  color = "grey", stroke = 1, 
+              opacity = 0.6,
+              highlightOptions = highlightOptions(weight = 5,                                                                 color = "white", fillOpacity = 0.7, bringToFront = TRUE),
+              label = ~poli$NOMGEO,labelOptions = labelOptions(direction = "auto")) 
+map23
+```
+
+```{r, warning=FALSE, echo=FALSE, error=FALSE, message=FALSE, comment=NA, include=FALSE}
+cuadrantes <- st_read("C:/Users/vasq_/OneDrive/EjerciciosR/Mapas/cuadrantes/cuadrantes.shp")
+```
+
+# Extorsiones por cuadrantes (2023)
+
+```{r warning=FALSE}
+cuad23 <- leaflet(alcaldia2023) %>% addProviderTiles(providers$CartoDB.Positron) %>% 
+  addCircles(~longitud, ~latitud, weight = 3, radius = 40, stroke = TRUE,
+             fillOpacity = 0.8, color = "purple") %>% 
+  setView(lng = -99.12766, lat = 19.42847, zoom = 10) %>% 
+  addPolygons(data = cuadrantes, weight = 0.5, color = "brown", stroke = 1, opacity = 0.6,
+              highlightOptions = highlightOptions(weight = 5)) %>% 
+  addPolygons(data = poli, weight = 2,  color = "grey", stroke = 1, opacity = 0.5, 
+              highlightOptions = highlightOptions(weight = 5, color = "white", 
+                                                  fillOpacity = 0.7, bringToFront = TRUE),
+              label = ~poli$NOMGEO,labelOptions = labelOptions(direction = "auto"))
+cuad23
+```
+
